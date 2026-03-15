@@ -161,17 +161,18 @@
       font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 800; line-height: 1.3;
       letter-spacing: -.02em; margin-bottom: 16px; color: #222;
     }
-    .section-desc { color: #888; font-size: .92rem; max-width: 660px; margin-bottom: 48px; line-height: 1.9; }
+    .section-desc { color: #888; font-size: .92rem; max-width: 900px; margin-bottom: 28px; line-height: 1.9; }
 
     /* CARDS */
     .card-grid { display: grid; gap: 24px; }
     .card-grid--2 { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
     .card {
-      background: #FAFAFA; border: none;
-      border-radius: 16px; padding: 36px 30px; position: relative; overflow: hidden;
-      transition: transform .3s ease, box-shadow .3s ease;
+      background: transparent; border: none; border-bottom: 1px solid #f0f0f0;
+      border-radius: 0; padding: 28px 0; position: relative; overflow: hidden;
+      transition: none;
     }
-    .card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,.06); border-color: transparent; }
+    .card:last-child { border-bottom: none; }
+    .card:hover { transform: none; box-shadow: none; }
     .card::before { display: none; }
     .card .icon {
       width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
@@ -225,21 +226,57 @@
     .meta-highlight .stat { color: #6C5CE7; font-weight: 700; font-size: 1rem; }
 
     /* PIPELINE */
-    .pipeline { position: relative; padding-left: 48px; }
-    .pipeline::before {
-      content: ''; position: absolute; left: 18px; top: 0; bottom: 0; width: 2px;
-      background: #E8E5F0; opacity: 1;
+    .pipeline { position: relative; padding-left: 64px; }
+    /* 배경 트랙 (연한 선) */
+    .pipeline-track {
+      position: absolute; left: 29px; top: 0; bottom: 0; width: 3px;
+      background: #EDE9FE; border-radius: 3px; z-index: 0; pointer-events: none;
+    }
+    /* 진행 그라디언트 라인 — 원 뒤로 */
+    .pipeline-progress {
+      position: absolute; left: 29px; top: 0; width: 3px; height: 0%;
+      background: linear-gradient(180deg, #8B5CF6 0%, #A78BFA 40%, #8B5CF6 70%, #7C3AED 100%);
+      border-radius: 3px; z-index: 0; pointer-events: none;
+      transition: height .1s linear;
+    }
+    /* 스텝 간 세모 커넥터 */
+    .step-connector {
+      position: absolute; left: -56px; bottom: -54px; width: 44px;
+      display: flex; justify-content: center; z-index: 3;
+    }
+    .step-connector .connector-line { display: none; }
+    .step-connector .connector-arrow {
+      width: 0; height: 0;
+      border-left: 7px solid transparent; border-right: 7px solid transparent;
+      border-top: 10px solid #C4B5FD;
+      filter: drop-shadow(0 1px 2px rgba(139,92,246,.15));
+      animation: arrowBounce 2s ease-in-out infinite;
+    }
+    @keyframes arrowBounce {
+      0%, 100% { transform: translateY(0); opacity: .6; }
+      50% { transform: translateY(4px); opacity: 1; }
     }
     .step { position: relative; margin-bottom: 100px; }
     .step:last-child { margin-bottom: 0; }
+    .step:last-child .step-connector { display: none; }
     .step .dot {
-      position: absolute; left: -48px; top: 4px; width: 36px; height: 36px;
+      position: absolute; left: -56px; top: 0; width: 44px; height: 44px;
       border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      font-size: .78rem; font-weight: 800; color: #fff; z-index: 2;
-      background: #6C5CE7 !important; box-shadow: none;
+      font-size: .85rem; font-weight: 800; color: #fff; z-index: 5;
+      background: #8B5CF6; box-shadow: 0 0 0 5px #fff, 0 0 0 8px rgba(139,92,246,.12);
+      transition: transform .3s, box-shadow .3s;
     }
-    .step:nth-child(1) .dot, .step:nth-child(2) .dot, .step:nth-child(3) .dot,
-    .step:nth-child(4) .dot, .step:nth-child(5) .dot { background: #6C5CE7 !important; }
+    .step.active .dot {
+      transform: scale(1.12);
+      box-shadow: 0 0 0 5px #fff, 0 0 0 9px rgba(139,92,246,.22), 0 4px 20px rgba(139,92,246,.2);
+    }
+    /* 스텝 라벨 뱃지 */
+    .step .step-label {
+      display: inline-block; padding: 4px 14px; border-radius: 100px;
+      font-size: .7rem; font-weight: 700; letter-spacing: .08em;
+      background: rgba(139,92,246,.06); color: #8B5CF6; border: none;
+      margin-bottom: 8px;
+    }
     .step h3 { font-size: 1.15rem; font-weight: 700; color: #222; margin-bottom: 8px; }
     .step > p { font-size: .9rem; color: #888; margin-bottom: 24px; line-height: 1.8; }
 
@@ -261,7 +298,7 @@
     .tbl-collapsible {
       max-height: 0; overflow: hidden; transition: max-height .4s cubic-bezier(.22,1,.36,1);
     }
-    .tbl-collapsible.open { max-height: 600px; }
+    .tbl-collapsible.open { max-height: 2000px; }
 
     /* TABLE */
     .tbl-wrap {
@@ -308,17 +345,18 @@
     }
     .step-screenshot:hover .zoom-badge { opacity: 1; }
 
-    /* STEP GALLERY — horizontal row */
+    /* STEP GALLERY — equal height row */
     .step-gallery {
-      display: flex; flex-direction: column; gap: 12px;
+      position: relative;
     }
     .step-gallery .gallery-track {
-      display: flex; flex-direction: row; gap: 12px;
+      display: flex; gap: 16px;
     }
     .step-gallery .gallery-track img {
-      flex: 1 1 0; min-width: 0; height: auto; display: block; cursor: pointer;
+      flex: 1 1 0; min-width: 0; width: 0; height: auto;
+      display: block; cursor: pointer;
       border-radius: 12px; border: 1px solid #eee;
-      background: #FAFAFA; object-fit: cover;
+      background: #fff; object-fit: contain;
       transition: transform .3s, box-shadow .3s;
     }
     .step-gallery .gallery-track img:hover {
@@ -430,7 +468,7 @@
     /* Evolution Timeline */
     .evo-timeline {
       display: flex; align-items: stretch; justify-content: center;
-      gap: 0; margin: 32px auto 8px; max-width: 860px;
+      gap: 0; margin: 32px auto 8px; max-width: 1100px;
     }
     .evo-arrow {
       display: flex; align-items: center; font-size: 1.3rem; font-weight: 700;
@@ -601,6 +639,13 @@
     footer { padding: 60px 0; text-align: center; border-top: 1px solid #eee; }
     footer p { font-size: .78rem; color: #aaa; }
 
+    @media (max-width: 720px) {
+      .pipeline { padding-left: 48px; }
+      .pipeline .pipeline-track, .pipeline .pipeline-progress { left: 23px; }
+      .step .dot { left: -42px; width: 36px; height: 36px; font-size: .75rem; }
+      .step-connector { left: -42px; width: 36px; bottom: -62px; }
+      .step { margin-bottom: 80px; }
+    }
     @media (max-width: 600px) {
       .container { padding: 0 20px; }
       nav ul { display: none; }
@@ -657,6 +702,7 @@
           <li>담당자의 경험과 직감 기반의 의사결정</li>
           <li>의사결정의 딜레이 발생</li>
         </ul>
+
       </div>
       <div class="evo-arrow reveal">→</div>
       <div class="evo-card evo-v1 reveal">
@@ -667,6 +713,7 @@
           <li>성과 우수 콘텐츠 알림</li>
           <li>제품 기획안 → AI 시딩 가이드 생성</li>
         </ul>
+
       </div>
       <div class="evo-arrow reveal">→</div>
       <div class="evo-card evo-v2 reveal">
@@ -678,15 +725,17 @@
           <li>인플루언서 크롤링&분석 → 최적의 컨셉 매칭</li>
           <li>전체 콘텐츠 모니터링 → 소재별 효율 분석</li>
         </ul>
+
       </div>
     </div>
     <br>
-      <p class="intro-desc">기존 '단순 콘텐츠 관리'에 머물렀던 대시보드를 외부 소셜 데이터를 AI가 분석하여 <strong>반응률이 좋은 트렌드</strong>를 업무에 적용하고, 변경된 META 광고 로직에 완벽히 대응하는 <strong class="em">'소재 중심의 캠페인 운영 플랫폼(v2.0)'</strong>으로 도약하고자 합니다.</p>
+    <br>
+      <p class="intro-desc">기존 '콘텐츠 관리'에 머물렀던 대시보드를 외부 소셜 데이터를 AI가 분석하여 <strong>반응률이 좋은 트렌드</strong>를 적용하고, 변경된 광고 로직에 완벽히 대응하는 <strong class="em">'소재 중심의 캠페인 운영 플랫폼(v2.0)'</strong>으로 도약하고자 합니다.</p>
     <div class="intro-arrow-connector">&#9660;</div>
     <h3 class="intro-sub"><span style="background:linear-gradient(transparent 55%,rgba(108,92,231,.25) 55%);padding:0 4px;">"Infinity LOOP : 유기적인 운영 싸이클 구축"</span></h3>
     <p class="intro-desc">단순 운영 툴을 넘어 유기적으로 이어지는 마케팅 자동화 사이클 구축이 목표입니다.</p>
     <div class="flow-loop">
-      <div class="flow-node flow-node--1">페
+      <div class="flow-node flow-node--1">
         <div class="flow-circle">트렌드<br>감지</div>
       </div>
       <svg class="flow-line" viewBox="0 0 80 12">
@@ -711,13 +760,9 @@
         <div class="flow-circle">성공 패턴<br>학습 및 자산화</div>
       </div>
     </div>
-    <svg class="flow-return-svg" viewBox="0 0 700 80">
-      <path d="M620 5 Q620 65, 350 70 Q80 65, 80 5" fill="none" stroke="rgba(108,92,231,.3)" stroke-width="2" stroke-dasharray="6 4" class="flow-dash-return"/>
-      <polygon points="76,12 84,12 80,3" fill="rgba(108,92,231,.4)"/>
-    </svg>
   </div>
 </div>
-
+</div>
 <!-- PART 1 -->
 <section id="background">
   <div class="part-banner part-banner--1 reveal">
@@ -738,7 +783,7 @@
 
       <div class="meta-grid">
         <div class="meta-box reveal-left">
-          <span class="tag tag--purple" style="margin-bottom:16px;">GEM : 초거대 AI 두뇌</span>
+          <span class="tag tag--purple" style="margin-bottom:16px;display:inline-flex;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#fff;color:#6C5CE7;font-size:.75rem;font-weight:800;flex-shrink:0;">1</span> GEM : 초거대 AI 두뇌</span>
           <p>기존의 단순 '키워드 매칭' 방식에서 벗어나, 광고 소재의 <strong style="color:#6C5CE7;">맥락(Context)</strong>을 파악하여 사용자의 <strong style="color:#6C5CE7;">잠재적 의도(Semantic)</strong>와 연결합니다.</p>
           <div class="example">
             <strong>[기존]</strong> '운동화' 키워드 매칭<br>
@@ -746,12 +791,12 @@
           </div>
         </div>
         <div class="meta-box reveal-right">
-          <span class="tag tag--blue" style="margin-bottom:16px;">Andromeda : 차세대 추천 엔진</span>
+          <span class="tag tag--blue" style="margin-bottom:16px;display:inline-flex;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#fff;color:#6C5CE7;font-size:.75rem;font-weight:800;flex-shrink:0;">2</span> Andromeda : 차세대 추천 엔진</span>
           <p>광고주가 설정한 인구통계학적 타겟팅보다, <strong style="color:#0EA5E9;">'이 광고 소재에 가장 반응할 확률이 높은 유저'</strong>를 AI가 스스로 찾아가 매칭합니다.</p>
           <div class="example">
             <strong>비건 뷰티 제품</strong><br>
             <strong>[기존]</strong> "2030 여성, 뷰티/화장품" 관심사 타겟 설정<br>
-            <strong>[변경]</strong> 환경 보호 콘텐츠에 반응하거나 성분 분석 앱을 이용하는 유저에게 광고 노출
+            <strong>[변경]</strong> 환경 보호 콘텐츠에 반응하거나 성분 분석 앱을 이용하는 유저에게 노출
           </div>
         </div>
       </div>
@@ -793,7 +838,7 @@
     <div class="part-conclusion reveal">
       <div class="part-conclusion-icon">&#9889;</div>
       <p class="part-conclusion-label">Conclusion</p>
-      <p class="part-conclusion-text">사람이 수동으로 이 속도와 양을 감당할 수 없습니다.<br>AI가 로직에 맞춰 트렌드를 읽고 무한대로 소재를 다각화하는 시스템이 필수적입니다.</p>
+      <p class="part-conclusion-text">수동으로 이 속도와 양을 감당하기엔 한계가 있습니다.<br>AI가 로직에 맞춰 트렌드를 읽고 무한대로 소재를 다각화하는 시스템이 필수적입니다.</p>
     </div>
   </div>
 
@@ -812,32 +857,21 @@
   </div>
   <div class="container">
     <div class="reveal">
-      <p class="section-desc">트렌드 감지부터 성과 검증까지, 5단계 파이프라인으로 캠페인 전 과정을 자동화합니다.</p>
+      <p class="section-desc">트렌드 감지부터 성과 검증까지, 5단계 파이프라인으로 캠페인 전 과정을 데이터의 근거해 설계하고 분석합니다.</p>
     </div>
 
     <div class="pipeline">
+      <div class="pipeline-track"></div>
+      <div class="pipeline-progress" id="pipelineProgress"></div>
 
       <!-- STEP 1 -->
       <div class="step reveal">
         <div class="dot">1</div>
-        <h3>트렌드 감지 및 인플루언서 발굴</h3>
-        <p>카테고리별 외부 SNS 최신 트렌드를 AI가 감지하여 유효한 콘텐츠 유형을 즉각 제안하고 소재 컨셉에 반영합니다. 타사 및 자사 풀의 인플루언서를 딥다이브 분석하여 캠페인에 가장 적합한 페르소나를 매칭합니다.</p>
+        <div class="step-connector"><div class="connector-line"></div><div class="connector-arrow"></div></div>
+        <div class="step-label">STEP 01</div>
+        <h3>인플루언서 발굴 및 트렌드 감지</h3>
+        <p>타사 및 자사 인플루언서를 크롤링한 데이터를 AI가 심층 분석하여 설정 된 페르소나를 도출합니다.<br> 이후 캠페인 진행 시, 제품 소구에 가장 적합한 인플루언서를 제안합니다.</p>
         <div class="step-body">
-          <div class="tbl-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open');">
-            <span class="tbl-toggle-icon">&#9654;</span><span>상세 기능 보기</span>
-          </div>
-          <div class="tbl-collapsible">
-          <div class="tbl-wrap">
-            <table>
-              <thead><tr><th>핵심 기능</th><th>실무 적용 포인트</th></tr></thead>
-              <tbody>
-                <tr><td>AI 매칭 & 딥 프로필</td><td>페르소나 타겟팅 기반 자동 추천 및 팔로워/조회수 심층 분석</td></tr>
-                <tr><td>AI 콘텐츠 플랜</td><td>매칭된 인플루언서의 성향을 고려한 맞춤형 콘텐츠 제안</td></tr>
-                <tr><td>상태 & 벌크 관리</td><td>섭외 단계별(제안→선정→확정→포스팅) 파이프라인 및 다수 인원 일괄 관리</td></tr>
-              </tbody>
-            </table>
-          </div>
-          </div>
           <div class="step-gallery" data-caption="Step 1 — 트렌드 감지 및 인플루언서 발굴">
             <div class="gallery-track">
               <img src="images/STEP%2001-1.png" alt="Step 1-1">
@@ -849,51 +883,16 @@
           </div>
 
           <div style="margin-top:32px;">
-            <h4 style="font-size:1.1rem;font-weight:700;color:#222;margin-bottom:8px;">AI 트렌드 감지 및 소재 자산화</h4>
-            <p style="font-size:.88rem;color:#888;margin-bottom:20px;">외부 트렌드와 인플루언서를 지속 트래킹하여 우리 캠페인에 활용될 수 있도록 자산화합니다.</p>
-            <div class="card-grid card-grid--2">
-              <div class="card">
-                <div class="icon icon--purple">📡</div>
-                <h3>뷰티 트렌드 레이더</h3>
-                <p>카테고리별 SNS 트렌드를 AI가 크롤링 · 분류하여, 지금 뜨고있는 콘텐츠를 실무자에게 공유하고 캠페인 소재로 자산화합니다.</p>
-                <div class="picto-flow">
-                  <div class="picto-step">
-                    <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><rect x="4" y="6" width="28" height="24" rx="3" stroke="#6C5CE7" stroke-width="1.8"/><circle cx="18" cy="18" r="4" fill="rgba(108,92,231,.15)" stroke="#6C5CE7" stroke-width="1.5"/><path d="M10 27l4-5 3 2 5-6 4 5" stroke="#6C5CE7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    <span>SNS 트렌드<br>크롤링</span>
-                  </div>
-                  <div class="picto-arrow">→</div>
-                  <div class="picto-step">
-                    <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><rect x="6" y="4" width="24" height="28" rx="3" stroke="#6C5CE7" stroke-width="1.8"/><path d="M12 12h12M12 17h8M12 22h10" stroke="#6C5CE7" stroke-width="1.5" stroke-linecap="round"/><circle cx="27" cy="27" r="6" fill="rgba(108,92,231,.12)" stroke="#6C5CE7" stroke-width="1.5"/><path d="M25 27l1.5 1.5 3-3" stroke="#6C5CE7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    <span>AI 콘텐츠<br>유형 분류</span>
-                  </div>
-                  <div class="picto-arrow">→</div>
-                  <div class="picto-step">
-                    <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><path d="M18 6l2.5 6H27l-5 4 2 6.5L18 18l-6 4.5 2-6.5-5-4h6.5z" fill="rgba(108,92,231,.12)" stroke="#6C5CE7" stroke-width="1.5" stroke-linejoin="round"/></svg>
-                    <span>실무자 공유<br>& 자산화</span>
-                  </div>
-                </div>
+            <h4 style="font-size:1.1rem;font-weight:700;color:#222;margin-bottom:8px;">뷰티 트렌드 감지 및 활용</h4>
+            <p style="font-size:.88rem;color:#888;margin-bottom:20px;">SNS 채널별 뷰티 키워드를 AI가 크롤링 · 분류하여, 지금 뜨고있는 콘텐츠를 실무자에게 공유하고 캠페인 소재 컨셉으로 반영합니다.</p>
+            <div class="step-gallery" data-caption="Step 1 — 뷰티 트렌드 감지 및 소재 자산화">
+              <div class="gallery-track">
+                <img src="images/STEP01-3.png" alt="트렌드 감지 예시 3" style="flex:none;height:360px;width:auto;">
+                <img src="images/STEP%2001-4.png" alt="트렌드 감지 예시 4" style="flex:none;height:360px;width:auto;">
               </div>
-              <div class="card">
-                <div class="icon icon--blue">🤖</div>
-                <h3>Influencer Find Agent</h3>
-                <p>팔로워 수가 아닌 콘텐츠 효율과 트렌드 적합도를 AI가 심층 분석하여, 캠페인에 최적인 인플루언서를 자동 발굴합니다.</p>
-                <div class="picto-flow">
-                  <div class="picto-step">
-                    <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><circle cx="14" cy="13" r="5" fill="rgba(14,165,233,.1)" stroke="#0EA5E9" stroke-width="1.5"/><circle cx="24" cy="13" r="5" fill="rgba(14,165,233,.1)" stroke="#0EA5E9" stroke-width="1.5"/><path d="M6 28c0-4 4-7 8-7s8 3 8 7" stroke="#0EA5E9" stroke-width="1.5" stroke-linecap="round"/></svg>
-                    <span>인플루언서<br>풀 추적</span>
-                  </div>
-                  <div class="picto-arrow" style="color:#0EA5E9;">→</div>
-                  <div class="picto-step">
-                    <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><rect x="6" y="8" width="24" height="20" rx="3" stroke="#0EA5E9" stroke-width="1.8"/><path d="M12 18h4v6h-4z" fill="rgba(14,165,233,.15)" stroke="#0EA5E9" stroke-width="1.2"/><path d="M20 14h4v10h-4z" fill="rgba(14,165,233,.15)" stroke="#0EA5E9" stroke-width="1.2"/></svg>
-                    <span>AI 심층분석<br>(효율/트렌드)</span>
-                  </div>
-                  <div class="picto-arrow" style="color:#0EA5E9;">→</div>
-                  <div class="picto-step">
-                    <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="14" r="6" fill="rgba(14,165,233,.1)" stroke="#0EA5E9" stroke-width="1.5"/><path d="M18 20v4M14 28h8" stroke="#0EA5E9" stroke-width="1.5" stroke-linecap="round"/><path d="M24 10l3-3M12 10l-3-3" stroke="#0EA5E9" stroke-width="1.5" stroke-linecap="round"/><circle cx="18" cy="14" r="2" fill="#0EA5E9"/></svg>
-                    <span>최적 인물<br>발굴 & 매칭</span>
-                  </div>
-                </div>
-              </div>
+              <button class="gallery-nav gallery-prev">&#8249;</button>
+              <button class="gallery-nav gallery-next">&#8250;</button>
+              <div class="gallery-dots"></div>
             </div>
           </div>
         </div>
@@ -902,8 +901,10 @@
       <!-- STEP 2 -->
       <div class="step reveal">
         <div class="dot">2</div>
-        <h3>PDA 프레임워크 기반 맞춤형 소재 전략 세팅</h3>
-        <p>브랜드 DNA를 기반으로 P(페르소나) × D(욕구) × A(인지단계) 매트릭스를 조합하여 빈틈없이 캠페인 컨셉을 도출합니다.</p>
+        <div class="step-connector"><div class="connector-line"></div><div class="connector-arrow"></div></div>
+        <div class="step-label">STEP 02</div>
+        <h3>P.D.A 프레임워크 기반 맞춤형 소재 전략 세팅</h3>
+        <p>브랜드 DNA와 제품 기획안을 기반으로 P(페르소나) × D(욕구) × A(인지단계) 매트릭스를 조합하여 빈틈없이 캠페인 컨셉을 도출합니다.<br>제품의 타겟과 USP를 활용하여 'P.D.A = 누구에게 어떤 욕구를 어떻게 후킹할지' 설계합니다.</p>
         <div class="step-body">
           <div class="tbl-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open');">
             <span class="tbl-toggle-icon">&#9654;</span><span>상세 기능 보기</span>
@@ -913,18 +914,64 @@
             <table>
               <thead><tr><th>기능</th><th>설명</th></tr></thead>
               <tbody>
-                <tr><td>페르소나 & 디자이어</td><td>고객 유형(프로필/행동) 및 감정을 자극하는 소구점(Trigger) 설계</td></tr>
-                <tr><td>인지단계 매핑</td><td>TOFU / MOFU / BOFU 퍼널별 P×D 구분</td></tr>
+                <tr><td>Persona 페르소나 & Desire 욕구</td><td>고객 유형(프로필/행동) 및 감정을 자극하는 소구점(Trigger) 설계</td></tr>
+                <tr><td>Awareness 인지단계 매핑</td><td>P×D 매트릭스 기반 TOFU(미인지) / MOFU(인지) / BOFU(구매고려) 퍼널별 구분 </td></tr>
                 <tr><td>컨셉 매트릭스</td><td>P × D × A 조합에서 콘텐츠 컨셉 자동 생성</td></tr>
               </tbody>
             </table>
           </div>
           </div>
+
+          <!-- 페르소나 & 디자이어 예시 토글 -->
+          <div class="tbl-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open');">
+            <span class="tbl-toggle-icon">&#9654;</span>
+            <span style="display:inline-flex;align-items:center;gap:6px;">
+              <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(14,165,233,.1);color:#0EA5E9;font-size:.7rem;font-weight:800;">P</span>
+              <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(16,185,129,.1);color:#10B981;font-size:.7rem;font-weight:800;">D</span>
+              F&CO 페르소나 × 디자이어 설계 예시
+            </span>
+          </div>
+          <div class="tbl-collapsible">
+            <div style="padding:16px 0;display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+              <div>
+                <p style="font-size:.82rem;font-weight:600;color:#0EA5E9;margin-bottom:10px;">Persona — 타겟 고객 프로필</p>
+                <div class="tbl-wrap" style="border:1px solid #eee;border-radius:10px;font-size:.72rem;">
+                  <table>
+                    <thead><tr><th>코드</th><th>페르소나</th><th>연령</th><th>직업</th><th>주요 고민</th></tr></thead>
+                    <tbody>
+                      <tr><td><span style="background:#8B5CF6;color:#fff;padding:2px 8px;border-radius:100px;font-size:.72rem;font-weight:700;">P1</span></td><td>피부 입문자</td><td>18-24</td><td>대학생, 취준생</td><td>화장이 서투름, 정보 과부하</td></tr>
+                      <tr><td><span style="background:#8B5CF6;color:#fff;padding:2px 8px;border-radius:100px;font-size:.72rem;font-weight:700;">P2</span></td><td>효율 추구형</td><td>25-34</td><td>직장인</td><td>아침 화장 시간 부족, 다크닝</td></tr>
+                      <tr><td><span style="background:#8B5CF6;color:#fff;padding:2px 8px;border-radius:100px;font-size:.72rem;font-weight:700;">P4</span></td><td>얼리 안티에이징</td><td>25-29</td><td>사무직 직장인</td><td>눈가 잔주름, 탄력 저하 불안</td></tr>
+                      <tr><td><span style="background:#8B5CF6;color:#fff;padding:2px 8px;border-radius:100px;font-size:.72rem;font-weight:700;">P5</span></td><td>클린 뷰티 비건</td><td>20-35</td><td>전문직, 프리랜서</td><td>유해 성분 우려, 철학 부재</td></tr>
+                      <tr><td><span style="background:#8B5CF6;color:#fff;padding:2px 8px;border-radius:100px;font-size:.72rem;font-weight:700;">P7</span></td><td>트러블 슈터</td><td>15-24</td><td>학생, 취준생</td><td>반복 트러블, 흉터, 넓은 모공</td></tr>
+                      <tr><td><span style="background:#8B5CF6;color:#fff;padding:2px 8px;border-radius:100px;font-size:.72rem;font-weight:700;">P10</span></td><td>바쁜 워킹/육아맘</td><td>30-45</td><td>워킹맘, 육아맘</td><td>시간 부족, 거칠어진 피부 결</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div>
+                <p style="font-size:.82rem;font-weight:600;color:#10B981;margin-bottom:10px;">Desire — 핵심 욕구 & 감정 트리거</p>
+                <div class="tbl-wrap" style="border:1px solid #eee;border-radius:10px;font-size:.72rem;">
+                  <table>
+                    <thead><tr><th>코드</th><th>디자이어</th><th>정의</th><th>감정 트리거</th><th>연관 제품</th></tr></thead>
+                    <tbody>
+                      <tr><td><span style="background:#10B981;color:#fff;padding:2px 8px;border-radius:100px;font-size:.72rem;font-weight:700;">D1</span></td><td>사회적 자신감</td><td>매력적으로 보이고 싶은 욕구</td><td>타인의 시선, 첫인상 불안</td><td>메이크업, 톤업 크림, 향수</td></tr>
+                      <tr><td><span style="background:#10B981;color:#fff;padding:2px 8px;border-radius:100px;font-size:.72rem;font-weight:700;">D2</span></td><td>피부 건강/보호</td><td>유해 성분에서 피부를 지키려는 욕구</td><td>케모포비아, 민감 반응</td><td>더마 코스메틱, 무자극 라인</td></tr>
+                      <tr><td><span style="background:#10B981;color:#fff;padding:2px 8px;border-radius:100px;font-size:.72rem;font-weight:700;">D3</span></td><td>시간 역행(노화 방지)</td><td>젊음을 유지하려는 욕구</td><td>일상 속 번아웃</td><td>올인원, 패드 토너, 퀵 메이크업</td></tr>
+                      <tr><td><span style="background:#10B981;color:#fff;padding:2px 8px;border-radius:100px;font-size:.72rem;font-weight:700;">D5</span></td><td>가치 소비/윤리</td><td>올바른 신념을 실천하려는 욕구</td><td>소비 죄책감, 실천 자부심</td><td>비건 뷰티, 친환경 패키지</td></tr>
+                      <tr><td><span style="background:#10B981;color:#fff;padding:2px 8px;border-radius:100px;font-size:.72rem;font-weight:700;">D6</span></td><td>럭셔리/지위 과시</td><td>프리미엄으로 가치를 높이려는 욕구</td><td>특별대우 기대, 부러움 유발</td><td>명품 브랜드, 리미티드 에디션</td></tr>
+                      <tr><td><span style="background:#10B981;color:#fff;padding:2px 8px;border-radius:100px;font-size:.72rem;font-weight:700;">D7</span></td><td>트렌드 동질감</td><td>최신 뷰티 문화를 향유하려는 욕구</td><td>FOMO, 호기심</td><td>신제품 런칭 세트, 콜라보 제품</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="step-gallery" data-caption="Step 2 — PDA 프레임워크 소재 전략">
             <div class="gallery-track">
-              <img src="images/STEP%2002_1.png" alt="Step 2-1">
-              <img src="images/STEP%2002_2.png" alt="Step 2-2">
-              <img src="images/STEP%2002_3.png" alt="Step 2-3">
+              <img src="images/STEP%2002-1.png" alt="Step 2-1" style="flex:none;height:360px;width:auto;">
+              <img src="images/STEP%2002-2.png" alt="Step 2-2" style="flex:none;height:360px;width:auto;">
             </div>
             <button class="gallery-nav gallery-prev">&#8249;</button>
             <button class="gallery-nav gallery-next">&#8250;</button>
@@ -936,8 +983,10 @@
       <!-- STEP 3 -->
       <div class="step reveal">
         <div class="dot">3</div>
+        <div class="step-connector"><div class="connector-line"></div><div class="connector-arrow"></div></div>
+        <div class="step-label">STEP 03</div>
         <h3>AI 전략 생성 및 콘텐츠 가이드 제작</h3>
-        <p>세팅된 P.D.A 컨셉을 바탕으로 채널/예산 전략, 내러티브 아크(Tease-Launch-Spread 흐름)를 설계하고 AI가 실제 제작물(시딩 가이드)을 생성하는 '콘텐츠 공장' 단계입니다.</p>
+        <p>세팅된 P.D.A 컨셉을 바탕으로 채널/예산 전략, 내러티브 아크(단계별 업로드 시점)를 설계하고 AI가 시딩 가이드을 생성하는 '콘텐츠 공장' 단계입니다.</p>
         <div class="step-body">
           <div class="tbl-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open');">
             <span class="tbl-toggle-icon">&#9654;</span><span>상세 기능 보기</span>
@@ -947,19 +996,18 @@
             <table>
               <thead><tr><th>기능</th><th>설명</th></tr></thead>
               <tbody>
-                <tr><td>AI 통합 전략 & 가이드</td><td>SNS 채널 · 메시징 · 타이밍 · 예산 배분 전략 자동 생성</td></tr>
-                <tr><td>내러티브 아크</td><td>Tease → Launch → Spread → LastCall 시퀀스 설계</td></tr>
-                <tr><td>AI 이미지 & 영상 가이드</td><td>시나리오 기반 AI 이미지(Nanobana Pro) → AI 영상(Kling) 자동 제작</td></tr>
-                <tr><td>훅 뱅크</td><td>12종 훅 유형 라이브러리 (3초 Hooking)</td></tr>
+                <tr><td>AI 통합 전략 & 가이드</td><td>SNS 채널 · 핵심 메시지 · 업로드 타이밍 · 예산 배분 전략 자동 생성</td></tr>
+                <tr><td>내러티브 아크</td><td>Tease → Launch → Spread → LastCall 단계별 업로드 시점 설계</td></tr>
+                <tr><td>AI 이미지 & 영상 가이드</td><td>시나리오 기반 AI 이미지(Nanobana Pro) → AI 영상(Kling3.0) 자동 제작</td></tr>
               </tbody>
             </table>
           </div>
           </div>
           <div class="step-gallery" data-caption="Step 3 — AI 전략 생성 및 콘텐츠 가이드">
             <div class="gallery-track">
-              <img src="images/STEP%2003_1.png" alt="Step 3-1">
-              <img src="images/STEP%2003_2.png" alt="Step 3-2">
-              <img src="images/STEP%2003_3.png" alt="Step 3-3">
+              <img src="images/STEP%2003-1.png" alt="Step 3-1">
+              <img src="images/STEP%2003%20-2.png" alt="Step 3-2">
+              <img src="images/STEP%2003-3.png" alt="Step 3-3">
             </div>
             <button class="gallery-nav gallery-prev">&#8249;</button>
             <button class="gallery-nav gallery-next">&#8250;</button>
@@ -971,27 +1019,15 @@
       <!-- STEP 4 -->
       <div class="step reveal">
         <div class="dot">4</div>
-        <h3>타임라인 통합 관리 및 실시간 광고 전환</h3>
-        <p>섭외 메일/DM 발송부터 콘텐츠 드롭(업로드) 타임라인 조율, 제품 발송까지 시스템 내에서 일원화합니다. 런칭된 시딩 콘텐츠의 초기 오가닉 반응을 실시간 분석하여 바이럴 조짐이 보이는 '초고효율 소재' 감지 시 즉각 메타 스폰서드 광고로 전환할 수 있도록 담당자에게 자동 알림을 발송합니다.</p>
+        <div class="step-connector"><div class="connector-line"></div><div class="connector-arrow"></div></div>
+        <div class="step-label">STEP 04</div>
+        <h3>콘텐츠 타임라인 통합 관리 및 실시간 광고 전환</h3>
+        <p>섭외 메일/DM 발송부터 콘텐츠 업로드 타임라인 조율, 제품 발송까지 시스템 내에서 일원화합니다.<br>런칭된 시딩 콘텐츠의 초기 오가닉 반응을 실시간 분석하여 바이럴 조짐이 보이는 '초고효율 소재' 감지 시<br>즉각 메타 스폰서드 광고로 전환할 수 있도록 담당자에게 자동 알림을 발송합니다.</p>
         <div class="step-body">
-          <div class="tbl-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open');">
-            <span class="tbl-toggle-icon">&#9654;</span><span>상세 기능 보기</span>
-          </div>
-          <div class="tbl-collapsible">
-          <div class="tbl-wrap">
-            <table>
-              <thead><tr><th>핵심 기능</th><th>실무 적용 포인트</th></tr></thead>
-              <tbody>
-                <tr><td>아웃리치 & 채널 관리</td><td>맞춤 브리프/이메일 자동 생성 및 SNS 채널별 배포 타임라인 관리</td></tr>
-                <tr><td>드롭 타임라인 관리</td><td>크리에이터 콘텐츠 업로드 스케줄 통합 조율 및 승인 플로우</td></tr>
-              </tbody>
-            </table>
-          </div>
-          </div>
           <div class="step-gallery" data-caption="Step 4 — 타임라인 통합 관리 및 실시간 광고 전환">
             <div class="gallery-track">
-              <!-- 이미지 추가: <img src="images/STEP%2004-1.png" alt="Step 4-1"> -->
-              <div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg><span>화면 캡쳐 이미지</span></div>
+              <img src="images/STEP%2004-1.png" alt="Step 4-1" style="flex:none;height:360px;width:auto;">
+              <img src="images/STEP%2004-2.png" alt="Step 4-2" style="flex:none;height:360px;width:auto;">
             </div>
             <button class="gallery-nav gallery-prev">&#8249;</button>
             <button class="gallery-nav gallery-next">&#8250;</button>
@@ -1003,8 +1039,9 @@
       <!-- STEP 5 -->
       <div class="step reveal">
         <div class="dot">5</div>
+        <div class="step-label">STEP 05</div>
         <h3>성과 검증 및 자동 최적화 — 콘텐츠 엔진 2.0</h3>
-        <p>성과를 분석하고 자산화하여 다음 캠페인을 준비하는 '학습' 단계입니다. P.D.A 히트맵으로 효율을 분석하고, 피로도가 쌓인 소재는 즉각 교체하며 성공한 소재는 글로벌로 증폭시킵니다.</p>
+        <p>성과를 분석하고 자산화하여 다음 캠페인을 준비하는 '학습' 단계입니다.<br>P.D.A 히트맵으로 효율을 분석하고, 피로도가 쌓인 소재는 즉각 교체하며 성공한 소재는 글로벌 채널로 증폭시킵니다.</p>
         <div class="step-body">
           <div class="tbl-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open');">
             <span class="tbl-toggle-icon">&#9654;</span><span>상세 기능 보기</span>
@@ -1015,16 +1052,16 @@
               <thead><tr><th>핵심 기능</th><th>실무 적용 포인트</th></tr></thead>
               <tbody>
                 <tr><td>P.D.A 히트맵 & 실시간 KPI</td><td>P×D×A 전략별 성과 히트맵 시각화 및 노출/인게이지먼트 실시간 추적</td></tr>
-                <tr><td>피로도 감지 & 크리에이티브 교체</td><td>오디언스 피로도 경고 알림 및 효율 저하 소재 자동 교체(로테이션) 제안</td></tr>
-                <tr><td>채널 리밸런싱 & UGC 플라이휠</td><td>실시간 예산 재배분 및 우수 시딩 콘텐츠 수확 → 큐레이션 → 증폭 사이클 구축</td></tr>
+                <tr><td>피로도 감지 & 크리에이티브 교체</td><td>오디언스 피로도 경고 알림 및 효율 저하 소재 자동 교체 제안</td></tr>
+                <tr><td>채널 리밸런싱 </td><td>실시간 예산 재배분 및 우수 시딩 콘텐츠 수확 → 큐레이션 → 증폭 사이클 구축</td></tr>
               </tbody>
             </table>
           </div>
           </div>
           <div class="step-gallery" data-caption="Step 5 — 성과 검증 및 자동 최적화">
             <div class="gallery-track">
-              <img src="images/STEP%2005-1.png" alt="Step 5-1">
-              <img src="images/STEP%2005-2.png" alt="Step 5-2">
+              <img src="images/STEP%2005-1.png" alt="Step 5-1" style="flex:none;height:360px;width:auto;">
+              <img src="images/STEP%2005-2.png" alt="Step 5-2" style="flex:none;height:360px;width:auto;">
             </div>
             <button class="gallery-nav gallery-prev">&#8249;</button>
             <button class="gallery-nav gallery-next">&#8250;</button>
@@ -1054,12 +1091,12 @@
       <div class="impact-card reveal">
         <div class="impact-icon">⚡</div>
         <h3>업무 효율성</h3>
-        <p>AI 콘텐츠 기획 및 인플루언서 자동 발굴로 실무 리소스를 획기적으로 절감합니다.</p>
+        <p>AI 콘텐츠 기획 및 인플루언서 자동 서칭으로<br>실무 리소스를 획기적으로 절감합니다.</p>
       </div>
       <div class="impact-card reveal">
         <div class="impact-icon">📈</div>
         <h3>ROI 극대화</h3>
-        <p>BF Score, P.D.A 히트맵 데이터에 기반한 의사결정으로 캠페인 성과를 개선합니다.</p>
+        <p>P.D.A 히트맵 데이터에 기반한 의사결정으로<br>캠페인 성과를 개선합니다.</p>
       </div>
       <div class="impact-card reveal">
         <div class="impact-icon">🌐</div>
@@ -1216,6 +1253,26 @@
   }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
   document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el => observer.observe(el));
 
+  // Pipeline progress line + active step
+  const pipelineEl = document.querySelector('.pipeline');
+  const pipelineProgressEl = document.getElementById('pipelineProgress');
+  const steps = document.querySelectorAll('.pipeline .step');
+  function updatePipeline() {
+    if (!pipelineEl || !pipelineProgressEl || steps.length === 0) return;
+    const pipeRect = pipelineEl.getBoundingClientRect();
+    const pipeTop = pipeRect.top;
+    const pipeHeight = pipeRect.height;
+    const triggerY = window.innerHeight * 0.55;
+    const progress = Math.min(Math.max((triggerY - pipeTop) / pipeHeight, 0), 1);
+    pipelineProgressEl.style.height = (progress * 100) + '%';
+    steps.forEach(step => {
+      const dotRect = step.querySelector('.dot').getBoundingClientRect();
+      step.classList.toggle('active', dotRect.top < triggerY);
+    });
+  }
+  window.addEventListener('scroll', updatePipeline, { passive: true });
+  updatePipeline();
+
   // Lightbox
   function openLightbox(el) {
     const img = el.querySelector('img');
@@ -1239,69 +1296,15 @@
     }
   });
 
-  // Gallery slider
-  document.querySelectorAll('.step-gallery').forEach(gallery => {
-    const track = gallery.querySelector('.gallery-track');
-    const imgs = track.querySelectorAll('img');
-    if (imgs.length < 2) return;
-
-    const dotsWrap = gallery.querySelector('.gallery-dots');
-    const prevBtn = gallery.querySelector('.gallery-prev');
-    const nextBtn = gallery.querySelector('.gallery-next');
-    let current = 0;
-
-    // Create dots
-    imgs.forEach((_, i) => {
-      const dot = document.createElement('span');
-      dot.className = 'gallery-dot' + (i === 0 ? ' active' : '');
-      dot.addEventListener('click', (e) => { e.stopPropagation(); goTo(i); });
-      dotsWrap.appendChild(dot);
-    });
-
-    function goTo(idx) {
-      current = ((idx % imgs.length) + imgs.length) % imgs.length;
-      track.style.transform = 'translateX(-' + (current * 100) + '%)';
-      dotsWrap.querySelectorAll('.gallery-dot').forEach((d, i) => {
-        d.classList.toggle('active', i === current);
-      });
-    }
-
-    prevBtn.addEventListener('click', (e) => { e.stopPropagation(); goTo(current - 1); resetAuto(); });
-    nextBtn.addEventListener('click', (e) => { e.stopPropagation(); goTo(current + 1); resetAuto(); });
-
-    // Auto-advance
-    let autoTimer = null;
-    const AUTO_INTERVAL = 4000;
-
-    function startAuto() {
-      stopAuto();
-      autoTimer = setInterval(() => goTo(current + 1), AUTO_INTERVAL);
-    }
-    function stopAuto() {
-      if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
-    }
-    function resetAuto() { startAuto(); }
-
-    // Start/stop on visibility
-    const visObs = new IntersectionObserver((entries) => {
-      entries.forEach(e => { if (e.isIntersecting) startAuto(); else stopAuto(); });
-    }, { threshold: 0.3 });
-    visObs.observe(gallery);
-
-    // Pause on hover
-    gallery.addEventListener('mouseenter', stopAuto);
-    gallery.addEventListener('mouseleave', startAuto);
-
-    // Click image to open lightbox
-    imgs.forEach(img => {
-      img.addEventListener('click', () => {
-        stopAuto();
-        const lb = document.getElementById('lightbox');
-        document.getElementById('lightbox-img').src = img.src;
-        document.getElementById('lightbox-caption').textContent = gallery.dataset.caption || '';
-        lb.classList.add('active');
-        document.body.style.overflow = 'hidden';
-      });
+  // Gallery — click image to open lightbox
+  document.querySelectorAll('.step-gallery .gallery-track img').forEach(img => {
+    img.addEventListener('click', () => {
+      const lb = document.getElementById('lightbox');
+      document.getElementById('lightbox-img').src = img.src;
+      const gallery = img.closest('.step-gallery');
+      document.getElementById('lightbox-caption').textContent = gallery ? gallery.dataset.caption : '';
+      lb.classList.add('active');
+      document.body.style.overflow = 'hidden';
     });
   });
 </script>
